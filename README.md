@@ -12,6 +12,8 @@
 
 A Fully Async-based backend for [Moerphous](https://github.com/moerphous/moerphous).
 
+**Note**: MongoDB is being used to store only the wallet `classic_address` and its `seed` to make transactions work. This project is just a POC for an NFT marketplace backend. In the future, once deployed on the mainnet, MetaMask will be utilized to connect the wallet.
+
 ## Table of Contents
 
 - [Development Requirements](#development-requirements)
@@ -127,7 +129,7 @@ MONGODB_DATABASE=xrpl
 
 ### 6. Create a Pinata Account
 
-Register an account on [pinata](https://app.pinata.cloud/register), and create a new API under the development.
+Register an account on [pinata](https://app.pinata.cloud/register), and create a new API under the development tab.
 
 ### 7. Set your Pinata Credentials
 
@@ -179,7 +181,7 @@ For development purposes, you can use openapi to interact with the endpoints. To
 
 ![create wallet](./static/create-wallet.png)
 
-- Copy the access token from the response, and use it to authenrize openapi with the backend.
+- Copy the access token from the response, and use it to authorize openapi with the backend.
 
 ![create wallet](./static/create-wallet-response.png)
 
@@ -189,7 +191,7 @@ For development purposes, you can use openapi to interact with the endpoints. To
 
 As you can notice, the default openapi authorization form has been customized to authenticate wallets using only an access token.
 
-- Now you can interact with any endpoints that requires authorization.
+- Now you can interact with any endpoints that require authorization.
 
 ![wallet info](./static/wallet-info.png)
 
