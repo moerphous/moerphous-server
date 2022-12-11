@@ -177,21 +177,21 @@ For development purposes, you can use openapi to interact with the endpoints. To
 
 - Generate a faucet wallet through the `/api/v1/wallet` post endpoint.
 
-[create wallet](./static/create-wallet.png)
+![create wallet](./static/create-wallet.png)
 
 - Copy the access token from the response, and use it to authenrize openapi with the backend.
 
-[create wallet](./static/create-wallet-response.png)
+![create wallet](./static/create-wallet-response.png)
 
-[authorize button](./static/authorize-button.png)
+![authorize button](./static/authorize-button.png)
 
-[authorize token](./static/authorize-token.png)
+![authorize token](./static/authorize-token.png)
 
 As you can notice, the default openapi authorization form has been customized to authenticate wallets using only an access token.
 
 - Now you can interact with any endpoints that requires authorization.
 
-[wallet info](./static/wallet-info.png)
+![wallet info](./static/wallet-info.png)
 
 ## Deployments
 
