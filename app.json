@@ -1,0 +1,66 @@
+{
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "description": "A Fully Async-based backend for Moerphous built using FastAPI, ODMantic, MongoDB, IPFS, XRPL-PY and friends.",
+  "env": {
+    "DEBUG": {
+      "description": "This environment variable defines the debug level.`` means production. `info` to access the docs.",
+      "required": false,
+      "value": ""
+    },
+    "CORS_ORIGINS": {
+      "description": "Comma separated urls of the deployed client.",
+      "required": true
+    },
+    "JWT_SECRET_KEY": {
+      "description": "Secret used to sign the JWTs",
+      "generator": "secret",
+      "required": true
+    },
+    "MONGODB_USERNAME": {
+      "description": "This is the user name you'll be creating for remote accesses.",
+      "required": true
+    },
+    "MONGODB_PASSWORD": {
+      "description": "The corresponding password for that user.",
+      "required": true
+    },
+    "MONGODB_HOST": {
+      "description": "Your remote MongoDB server's domain name.",
+      "required": true
+    },
+    "MONGODB_DATABASE": {
+      "description": "The name of the database you want to access, in our case, the `xrpl` database.",
+      "required": false,
+      "value": "xrpl"
+    },
+    "PINATA_API_KEY": {
+      "description": "Your pinata api key.",
+      "required": true
+    },
+    "PINATA_API_SECRET": {
+      "description": "Your pinata api secret.",
+      "required": true
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "image": "heroku/python",
+  "keywords": [
+    "fastapi",
+    "mongodb",
+    "deta",
+    "xrpl",
+    "api"
+  ],
+  "name": "moerphous-server",
+  "repository": "https://github.com/moerphous/moerphous-server",
+  "success_url": "/docs"
+}
