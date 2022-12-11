@@ -1,0 +1,3 @@
+[submodule "moerphous"]
+	path = moerphous
+	url = https://github.com/moerphous/moerphous
