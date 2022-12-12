@@ -32,6 +32,7 @@ from xrpl.models.transactions import (
     NFTokenMint,
 )
 from xrpl.utils import (
+    hex_to_str,
     str_to_hex,
 )
 from xrpl.wallet import (
@@ -116,7 +117,7 @@ async def mint_nft_token(
         account=classic_address,
         nftoken_taxon=0,
         uri=str_to_hex(meta_data),
-        flags=AccountSetFlag.ASF_DEFAULT_RIPPLE,  # Enable rippling on this account’s.
+        flags=AccountSetFlag.ASF_DEFAULT_RIPPLE,  # Enable rippling on this account.
     )
     tx_settings_prepared = await safe_sign_and_autofill_transaction(
         transaction=tx_settings,
@@ -200,3 +201,69 @@ async def burn_nft_token(
     )
     response = await send_reliable_submission(tx_settings_prepared, client)
     return response
+
+
+async def get_all_nfts(classic_address: str) -> Dict[str, Any]:
+    """
+    A method to fetch all nfts from the ledger for a given account.
+
+    Args:
+        classic_address (str) : A wallet classic address.
+    Returns:
+        Dict[str, Any]: A dict that represents the account info object.
+    """
+    client = AsyncJsonRpcClient(settings().json_rpc_url)
+    account_info = await get_account_transactions(classic_address, client)
+    results = []
+    created_nodes = [
+        element["CreatedNode"]["NewFields"]
+        for element in account_info[0]["meta"]["AffectedNodes"]
+        if "CreatedNode" in element
+    ]
+    modified_nodes = [
+        element["ModifiedNode"]["FinalFields"]
+        for element in account_info[0]["meta"]["AffectedNodes"]
+        if "ModifiedNode" in element
+    ]
+    # check if there are NFTokens to fetch meta_data
+    if len(modified_nodes) == 1 and not modified_nodes[0].get("NFTokens"):
+        modified_nodes = []
+    else:
+        modified_nodes = [
+            element for element in modified_nodes if "NFTokens" in element
+        ]
+    if len(created_nodes) == 1 and not created_nodes[0].get("NFTokens"):
+        created_nodes = []
+    else:
+        created_nodes = [element for element in created_nodes if "NFTokens" in element]
+    if len(modified_nodes) > 0 and "NFTokens" in modified_nodes[0]:
+        for modified_nftoken in modified_nodes[0]["NFTokens"]:
+            author_avatar, picture, title, price = hex_to_str(
+                modified_nftoken["NFToken"]["URI"]
+            ).split(",")
+            results.append(
+                {
+                    "id": modified_nftoken["NFToken"]["NFTokenID"],
+                    "author_avatar": author_avatar,
+                    "picture": picture,
+                    "title": title,
+                    "price": price,
+                }
+            )
+
+    if len(created_nodes) > 0 and "NFTokens" in created_nodes[0]:
+        for created_nftoken in created_nodes[0]["NFTokens"]:
+            author_avatar, picture, title, price = hex_to_str(
+                created_nftoken["NFToken"]["URI"]
+            ).split(",")
+            results.append(
+                {
+                    "id": created_nftoken["NFToken"]["NFTokenID"],
+                    "author_avatar": author_avatar,
+                    "picture": picture,
+                    "title": title,
+                    "price": price,
+                }
+            )
+
+    return {"status_code": 200, "results": results}

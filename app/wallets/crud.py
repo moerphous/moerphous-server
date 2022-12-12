@@ -131,10 +131,9 @@ async def get_wallet_info(classic_address: str, session: AIOSession) -> Dict[str
     if len(modified_nodes) > 0 and "NFTokens" in modified_nodes[0]:
         for nft_token in modified_nodes[0]["NFTokens"]:
             meta_data_url = hex_to_str(nft_token["NFToken"]["URI"])
-            print(meta_data_url)
-            if "png" not in meta_data_url:
+            if "png" not in meta_data_url and len(meta_data_url) == 1:
                 meta_data = requests.get(
-                    url=meta_data_url, verify=False, timeout=10
+                    url=meta_data_url, verify=False, timeout=30
                 ).text
                 meta_data_array = meta_data.split(",")
                 first_name, bio = meta_data_array
@@ -143,10 +142,9 @@ async def get_wallet_info(classic_address: str, session: AIOSession) -> Dict[str
     elif len(created_nodes) > 0 and "NFTokens" in created_nodes[0]:
         for nft_token in created_nodes[0]["NFTokens"]:
             meta_data_url = hex_to_str(nft_token["NFToken"]["URI"])
-            print(meta_data_url)
-            if "png" not in meta_data_url:
+            if "png" not in meta_data_url and len(meta_data_url) == 1:
                 meta_data = requests.get(
-                    url=meta_data_url, verify=False, timeout=10
+                    url=meta_data_url, verify=False, timeout=30
                 ).text
                 meta_data_array = meta_data.split(",")
                 first_name, bio = meta_data_array
@@ -191,7 +189,7 @@ async def update_wallet_info(
             # burn it, then mint a new one.
             if "png" not in meta_data_url:
                 meta_data = requests.get(
-                    url=meta_data_url, verify=False, timeout=10
+                    url=meta_data_url, verify=False, timeout=30
                 ).text
                 meta_data_array = meta_data.split(",")
                 if len(meta_data_array) == 2:

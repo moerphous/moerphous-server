@@ -1,5 +1,6 @@
 """The nfts router module"""
 
+import base64
 from fastapi import (
     APIRouter,
     Depends,
@@ -102,3 +103,59 @@ async def upload_nft_image(
         return {"status_code": 400, "message": "Something went wrong!"}
     finally:
         os.remove(temp.name)
+
+
+@router.post(
+    "/nft/upload-mint-nft",
+    name="nft:upload-mint-nft",
+    # response_model=Any,
+    # responses={
+    #     201: {
+    #         "model": Any,
+    #         "description": "A response object that contains info about"
+    #         " a wallet.",
+    #     },
+    # },
+)
+async def upload_nft_image_and_mint_nft(
+    nft_info: nfts_schemas.NFTBase64ObjectSchema,
+    current_wallet: Any = Depends(jwt.get_current_active_wallet),
+    session: AIOSession = Depends(dependencies.get_db_transactional_session),
+) -> Dict[str, Any]:
+    """
+    Upload a base64 encoded image to ipfs and mint it
+    """
+    base64_bytes = nft_info.picture.encode("ascii")
+    file_bytes = base64.b64decode(base64_bytes)
+    temp = NamedTemporaryFile(delete=False)
+    with temp as temp_file:
+        temp_file.write(file_bytes)
+    result = pinata.pin_file_to_ipfs(temp.name)
+    image_url = f"https://ipfs.io/ipfs/{result['IpfsHash']}/{temp.name.split('/')[-1]}"
+    meta_data = (
+        f"{nft_info.author_avatar},{image_url},{nft_info.title},{nft_info.price}"
+    )
+    await nfts_crud.mint_nft_token(current_wallet.classic_address, meta_data, session)
+    return {"status_code": 200, "message": "NFT minted successfully!"}
+
+
+@router.get(
+    "/nft/get-wallet-nfts",
+    name="nft:get-wallet-nfts",
+    # response_model=Any,
+    # responses={
+    #     201: {
+    #         "model": Any,
+    #         "description": "A response object that contains info about"
+    #         " a wallet.",
+    #     },
+    # },
+)
+async def fetch_all_nfts(
+    current_wallet: Any = Depends(jwt.get_current_active_wallet),
+) -> Dict[str, Any]:
+    """
+    Upload a base64 encoded image to ipfs and mint it
+    """
+    results = await nfts_crud.get_all_nfts(current_wallet.classic_address)
+    return results
