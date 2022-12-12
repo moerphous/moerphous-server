@@ -20,6 +20,7 @@ from typing import (
 from xrpl.asyncio.account import (
     get_account_info,
     get_account_transactions,
+    get_balance,
 )
 from xrpl.asyncio.clients import (
     AsyncJsonRpcClient,
@@ -28,6 +29,7 @@ from xrpl.asyncio.wallet import (
     generate_faucet_wallet,
 )
 from xrpl.utils import (
+    drops_to_xrp,
     hex_to_str,
 )
 
@@ -101,7 +103,7 @@ async def get_wallet_info(classic_address: str, session: AIOSession) -> Dict[str
     wallet = wallet.dict()
     wallet["id"] = str(wallet["id"])
     wallet.pop("seed")
-
+    balance = await get_balance(classic_address, client)
     account_info = await get_account_transactions(classic_address, client)
     # fetch metadata from created_nodes and modified_nodes
     created_nodes = [
@@ -151,7 +153,12 @@ async def get_wallet_info(classic_address: str, session: AIOSession) -> Dict[str
             elif "png" in meta_data_url:
                 profile_picture = meta_data_url[:-4]
     wallet.update(
-        {"first_name": first_name, "bio": bio, "author_avatar": profile_picture}
+        {
+            "first_name": first_name,
+            "bio": bio,
+            "author_avatar": profile_picture,
+            "balance": float(drops_to_xrp(str(balance))),
+        }
     )
     return wallet
 
