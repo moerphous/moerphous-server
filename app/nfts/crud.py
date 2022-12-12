@@ -238,32 +238,35 @@ async def get_all_nfts(classic_address: str) -> Dict[str, Any]:
         created_nodes = [element for element in created_nodes if "NFTokens" in element]
     if len(modified_nodes) > 0 and "NFTokens" in modified_nodes[0]:
         for modified_nftoken in modified_nodes[0]["NFTokens"]:
-            author_avatar, picture, title, price = hex_to_str(
+            modified_nftokens_list = hex_to_str(
                 modified_nftoken["NFToken"]["URI"]
             ).split(",")
-            results.append(
-                {
-                    "id": modified_nftoken["NFToken"]["NFTokenID"],
-                    "author_avatar": author_avatar,
-                    "picture": picture,
-                    "title": title,
-                    "price": price,
-                }
-            )
+            if len(modified_nftokens_list) == 4:
+                author_avatar, picture, title, price = modified_nftokens_list
+                results.append(
+                    {
+                        "id": modified_nftoken["NFToken"]["NFTokenID"],
+                        "author_avatar": author_avatar,
+                        "image_url": picture,
+                        "title": title,
+                        "price": price,
+                    }
+                )
 
     if len(created_nodes) > 0 and "NFTokens" in created_nodes[0]:
         for created_nftoken in created_nodes[0]["NFTokens"]:
-            author_avatar, picture, title, price = hex_to_str(
-                created_nftoken["NFToken"]["URI"]
-            ).split(",")
-            results.append(
-                {
-                    "id": created_nftoken["NFToken"]["NFTokenID"],
-                    "author_avatar": author_avatar,
-                    "picture": picture,
-                    "title": title,
-                    "price": price,
-                }
+            created_nftokens_list = hex_to_str(created_nftoken["NFToken"]["URI"]).split(
+                ","
             )
-
+            if len(created_nftokens_list) == 4:
+                author_avatar, picture, title, price = created_nftokens_list
+                results.append(
+                    {
+                        "id": created_nftoken["NFToken"]["NFTokenID"],
+                        "author_avatar": author_avatar,
+                        "image_url": picture,
+                        "title": title,
+                        "price": price,
+                    }
+                )
     return {"status_code": 200, "results": results}
