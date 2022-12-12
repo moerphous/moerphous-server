@@ -58,7 +58,7 @@ load-plugins=
 #   R0401 = cyclic import
 
 # Disable the message(s) with the given id(s).
-disable=E0611,C0411,E0401,R0903,W0703,C0413,W0707,R0801,R0401,W0613
+disable=E0611,C0411,E0401,R0903,W0703,C0413,W0707,R0801,R0401,W0613,R0914,W0612,R0912
 
 [REPORTS]
 

@@ -16,6 +16,7 @@ from tempfile import (
 from typing import (
     Any,
     Dict,
+    List,
 )
 from xrpl.asyncio.account import (
     get_account_info,
@@ -249,3 +250,86 @@ async def update_wallet_image(
                 break
     # mint a new nft given the image url
     return await nfts_crud.mint_nft_token(classic_address, image_url, session)
+
+
+async def get_all_wallet_info(session: AIOSession) -> List[Any]:
+    """
+    A method to fetch all wallets info.
+
+    Args:
+        session (odmantic.session.AIOSession) : odmantic session object.
+    Returns:
+        Dict[str, Any]: A list of  dicts that contains all wallets info.
+    """
+    client = AsyncJsonRpcClient(settings().json_rpc_url)
+    all_registered_wallets = await session.find(wallets_models.Wallet)
+    results = []
+    for wallet in all_registered_wallets:
+        wallet = wallet.dict()
+        wallet["id"] = str(wallet["id"])
+        wallet.pop("seed")
+        account_info = await get_account_transactions(wallet["classic_address"], client)
+        # fetch metadata from created_nodes and modified_nodes
+        created_nodes = [
+            element["CreatedNode"]["NewFields"]
+            for element in account_info[0]["meta"]["AffectedNodes"]
+            if "CreatedNode" in element
+        ]
+        modified_nodes = [
+            element["ModifiedNode"]["FinalFields"]
+            for element in account_info[0]["meta"]["AffectedNodes"]
+            if "ModifiedNode" in element
+        ]
+        # check if there are NFTokens to fetch meta_data
+        if len(modified_nodes) == 1 and not modified_nodes[0].get("NFTokens"):
+            modified_nodes = []
+        else:
+            modified_nodes = [
+                element for element in modified_nodes if "NFTokens" in element
+            ]
+        if len(created_nodes) == 1 and not created_nodes[0].get("NFTokens"):
+            created_nodes = []
+        else:
+            created_nodes = [
+                element for element in created_nodes if "NFTokens" in element
+            ]
+        first_name, bio, profile_picture = [
+            None,
+        ] * 3
+        total_nfts = 0
+        if len(modified_nodes) > 0 and "NFTokens" in modified_nodes[0]:
+            total_nfts = len(modified_nodes[0]["NFTokens"])
+            for nft_token in modified_nodes[0]["NFTokens"]:
+                meta_data_url = hex_to_str(nft_token["NFToken"]["URI"])
+                if "png" not in meta_data_url and len(meta_data_url) == 1:
+                    meta_data = requests.get(
+                        url=meta_data_url, verify=False, timeout=30
+                    ).text
+                    meta_data_array = meta_data.split(",")
+                    first_name, bio = meta_data_array
+                elif "png" in meta_data_url:
+                    profile_picture = meta_data_url[:-4]
+        elif len(created_nodes) > 0 and "NFTokens" in created_nodes[0]:
+            total_nfts += len(created_nodes[0]["NFTokens"])
+            for nft_token in created_nodes[0]["NFTokens"]:
+                meta_data_url = hex_to_str(nft_token["NFToken"]["URI"])
+                if "png" not in meta_data_url and len(meta_data_url) == 1:
+                    meta_data = requests.get(
+                        url=meta_data_url, verify=False, timeout=30
+                    ).text
+                    meta_data_array = meta_data.split(",")
+                    first_name, bio = meta_data_array
+                elif "png" in meta_data_url:
+                    profile_picture = meta_data_url[:-4]
+        wallet.update(
+            {
+                "first_name": first_name,
+                "profile_picture": profile_picture,
+                "nb_items": total_nfts,
+            }
+        )
+        results.append(wallet)
+    results = sorted(
+        results, key=lambda wallet_dict: wallet_dict["nb_items"], reverse=True
+    )
+    return results

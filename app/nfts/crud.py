@@ -270,3 +270,77 @@ async def get_all_nfts(classic_address: str) -> Dict[str, Any]:
                     }
                 )
     return {"status_code": 200, "results": results}
+
+
+async def get_all_wallets_nfts(session: AIOSession) -> Dict[str, Any]:
+    """
+    A method to fetch all nfts from the ledger for a given account.
+
+    Args:
+        session (odmantic.session.AIOSession) : odmantic session object.
+
+    Returns:
+        Dict[str, Any]: A dict that represents all info about all nfts.
+    """
+    client = AsyncJsonRpcClient(settings().json_rpc_url)
+    all_registered_wallets = await session.find(wallets_models.Wallet)
+    results = []
+    for wallet in all_registered_wallets:
+        account_info = await get_account_transactions(wallet.classic_address, client)
+        created_nodes = [
+            element["CreatedNode"]["NewFields"]
+            for element in account_info[0]["meta"]["AffectedNodes"]
+            if "CreatedNode" in element
+        ]
+        modified_nodes = [
+            element["ModifiedNode"]["FinalFields"]
+            for element in account_info[0]["meta"]["AffectedNodes"]
+            if "ModifiedNode" in element
+        ]
+        # check if there are NFTokens to fetch meta_data
+        if len(modified_nodes) == 1 and not modified_nodes[0].get("NFTokens"):
+            modified_nodes = []
+        else:
+            modified_nodes = [
+                element for element in modified_nodes if "NFTokens" in element
+            ]
+        if len(created_nodes) == 1 and not created_nodes[0].get("NFTokens"):
+            created_nodes = []
+        else:
+            created_nodes = [
+                element for element in created_nodes if "NFTokens" in element
+            ]
+        if len(modified_nodes) > 0 and "NFTokens" in modified_nodes[0]:
+            for modified_nftoken in modified_nodes[0]["NFTokens"]:
+                modified_nftokens_list = hex_to_str(
+                    modified_nftoken["NFToken"]["URI"]
+                ).split(",")
+                if len(modified_nftokens_list) == 4:
+                    author_avatar, picture, title, price = modified_nftokens_list
+                    results.append(
+                        {
+                            "id": modified_nftoken["NFToken"]["NFTokenID"],
+                            "author_avatar": author_avatar,
+                            "image_url": picture,
+                            "title": title,
+                            "price": price,
+                        }
+                    )
+
+        if len(created_nodes) > 0 and "NFTokens" in created_nodes[0]:
+            for created_nftoken in created_nodes[0]["NFTokens"]:
+                created_nftokens_list = hex_to_str(
+                    created_nftoken["NFToken"]["URI"]
+                ).split(",")
+                if len(created_nftokens_list) == 4:
+                    author_avatar, picture, title, price = created_nftokens_list
+                    results.append(
+                        {
+                            "id": created_nftoken["NFToken"]["NFTokenID"],
+                            "author_avatar": author_avatar,
+                            "image_url": picture,
+                            "title": title,
+                            "price": price,
+                        }
+                    )
+    return {"status_code": 200, "results": results}

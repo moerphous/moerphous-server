@@ -155,7 +155,29 @@ async def fetch_all_nfts(
     current_wallet: Any = Depends(jwt.get_current_active_wallet),
 ) -> Dict[str, Any]:
     """
-    Upload a base64 encoded image to ipfs and mint it
+    Fetch all nfts for the authenticated wallet.
     """
     results = await nfts_crud.get_all_nfts(current_wallet.classic_address)
+    return results
+
+
+@router.get(
+    "/nft/get-all",
+    name="nft:get-wallets-nfts",
+    # response_model=Any,
+    # responses={
+    #     201: {
+    #         "model": Any,
+    #         "description": "A response object that contains info about"
+    #         " a wallet.",
+    #     },
+    # },
+)
+async def fetch_all_wallets_nfts(
+    session: AIOSession = Depends(dependencies.get_db_transactional_session),
+) -> Dict[str, Any]:
+    """
+    Fetch all nfts for all registered wallets
+    """
+    results = await nfts_crud.get_all_wallets_nfts(session)
     return results

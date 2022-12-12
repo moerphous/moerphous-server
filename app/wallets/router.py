@@ -148,3 +148,21 @@ async def update_wallet_info(
         "status_code": 200,
         "message": "Your wallet information has been updated successfully!",
     }
+
+
+@router.get(
+    "/wallet/all",
+    name="wallet:get-all-info",
+)
+async def get_all_wallets_info(
+    session: AIOSession = Depends(dependencies.get_db_transactional_session),
+) -> Dict[str, Any]:
+    """
+    Get all wallets info.
+    """
+    wallet = await wallets_crud.get_all_wallet_info(session)
+    return {
+        "wallets": wallet,
+        "status_code": 200,
+        "message": "Welcome to Moerphous.",
+    }
