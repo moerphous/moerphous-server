@@ -135,7 +135,9 @@ async def upload_nft_image_and_mint_nft(
     meta_data = (
         f"{nft_info.author_avatar},{image_url},{nft_info.title},{nft_info.price}"
     )
-    await nfts_crud.mint_nft_token(current_wallet.classic_address, meta_data, session)
+    await nfts_crud.mint_nft_token(
+        current_wallet.classic_address, meta_data, session, True
+    )
     return {"status_code": 200, "message": "NFT minted successfully!"}
 
 
