@@ -30,9 +30,9 @@ RUN apt-get update \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-COPY ./brave-date/package.json  ./
-COPY ./brave-date/src ./src
-COPY ./brave-date/public ./public
+COPY ./moerphous/package.json  ./
+COPY ./moerphous/src ./src
+COPY ./moerphous/public ./public
 
 RUN npm install --force
 

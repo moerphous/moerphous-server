@@ -11,13 +11,13 @@ services:
 
   client:
     build:
-      context: brave-date
+      context: moerphous
       dockerfile: Dockerfile
     restart: always
     ports:
       - "3000:3000"
     volumes:
-      - ./brave-date:/brave-date
+      - ./moerphous:/moerphous
     depends_on:
       - lb
 
