@@ -252,7 +252,7 @@ async def get_all_wallet_info(session: AIOSession) -> List[Any]:
                 meta_data_array = meta_data.split(",")
                 if len(meta_data_array) == 2:
                     first_name, bio = meta_data_array
-                elif len(meta_data_array) == 4:
+                elif len(meta_data_array) == 5:
                     total_nfts += 1
             elif "png" in meta_data_url:
                 profile_picture = meta_data_url[:-4]
