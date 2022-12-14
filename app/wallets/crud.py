@@ -246,11 +246,15 @@ async def get_all_wallet_info(session: AIOSession) -> List[Any]:
         for nft_token in account_nfts:
             meta_data_url = hex_to_str(nft_token["URI"])
             if "png" not in meta_data_url:
-                meta_data = requests.get(url=meta_data_url, timeout=30).text
-                meta_data_array = meta_data.split(",")
+                try:
+                    meta_data = requests.get(url=meta_data_url, timeout=30).text
+                    meta_data_array = meta_data.split(",")
+                except Exception:
+                    meta_data_array = meta_data.split(",")[1:4]
+                    meta_data_array[2] = meta_data_array[2].split(":")[0]
                 if len(meta_data_array) == 2:
                     first_name, bio = meta_data_array
-                elif len(meta_data_array) == 5:
+                elif len(meta_data_array) in [3, 5]:
                     total_nfts += 1
             elif "png" in meta_data_url:
                 profile_picture = meta_data_url[:-4]
