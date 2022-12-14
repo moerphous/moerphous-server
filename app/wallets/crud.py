@@ -120,7 +120,7 @@ async def get_wallet_info(classic_address: str, session: AIOSession) -> Dict[str
     for nft_token in account_nfts:
         meta_data_url = hex_to_str(nft_token["URI"])
         if "png" not in meta_data_url:
-            meta_data = requests.get(url=meta_data_url, verify=False, timeout=30).text
+            meta_data = requests.get(url=meta_data_url, timeout=30).text
             meta_data_array = meta_data.split(",")
             if len(meta_data_array) == 2:
                 first_name, bio = meta_data_array
@@ -166,7 +166,7 @@ async def update_wallet_info(
         meta_data_url = hex_to_str(nft_token["URI"])
         # burn it, then mint a new one.
         if "png" not in meta_data_url:
-            meta_data = requests.get(url=meta_data_url, verify=False, timeout=30).text
+            meta_data = requests.get(url=meta_data_url, timeout=30).text
             meta_data_array = meta_data.split(",")
             if len(meta_data_array) == 2:
                 await nfts_crud.burn_nft_token(
@@ -246,9 +246,7 @@ async def get_all_wallet_info(session: AIOSession) -> List[Any]:
         for nft_token in account_nfts:
             meta_data_url = hex_to_str(nft_token["URI"])
             if "png" not in meta_data_url:
-                meta_data = requests.get(
-                    url=meta_data_url, verify=False, timeout=30
-                ).text
+                meta_data = requests.get(url=meta_data_url, timeout=30).text
                 meta_data_array = meta_data.split(",")
                 if len(meta_data_array) == 2:
                     first_name, bio = meta_data_array

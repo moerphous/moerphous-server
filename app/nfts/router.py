@@ -20,8 +20,12 @@ from tempfile import (
 from typing import (
     Any,
     Dict,
+    Union,
 )
 
+from app.auth import (
+    schemas as auth_schemas,
+)
 from app.config import (
     settings,
 )
@@ -44,14 +48,14 @@ pinata = PinataPy(settings().PINATA_API_KEY, settings().PINATA_API_SECRET)
 @router.post(
     "/nft/mint-offer",
     name="nft:mint-nft-with-offer",
-    # response_model=Any,
-    # responses={
-    #     201: {
-    #         "model": Any,
-    #         "description": "A response object that contains info about"
-    #         " a wallet.",
-    #     },
-    # },
+    response_model=auth_schemas.ResponseSchema,
+    responses={
+        200: {
+            "model": auth_schemas.ResponseSchema,
+            "description": "A response object that indicates an nft"
+            " has been minted successfully!",
+        },
+    },
 )
 async def mint_nft_token_with_offer(
     nft_info: nfts_schemas.NFTObjectSchema,
@@ -59,26 +63,31 @@ async def mint_nft_token_with_offer(
     session: AIOSession = Depends(dependencies.get_db_transactional_session),
 ) -> Dict[str, Any]:
     """
-    Generate a faucet wallet.
+    mint an nft token and create a sell offer.
     """
     meta_data = f"{nft_info.picture},{nft_info.title},{nft_info.price}"
-    results = await nfts_crud.mint_nft_token(
+    await nfts_crud.mint_nft_token(
         current_wallet.classic_address, meta_data, session, True
     )
-    return results
+    return {"status_code": 200, "message": "NFT minted successfully!"}
 
 
 @router.post(
     "/nft/upload-image",
     name="nft:upload-image",
-    # response_model=Any,
-    # responses={
-    #     201: {
-    #         "model": Any,
-    #         "description": "A response object that contains info about"
-    #         " a wallet.",
-    #     },
-    # },
+    response_model=Union[
+        auth_schemas.ResponseSchema, nfts_schemas.UploadImageResponseSchema
+    ],
+    responses={
+        400: {
+            "model": auth_schemas.ResponseSchema,
+            "description": "A response object that indicates something went wrong!",
+        },
+        200: {
+            "model": nfts_schemas.UploadImageResponseSchema,
+            "description": "A response object that contains an ipfs url of the image.",
+        },
+    },
 )
 async def upload_nft_image(
     file: UploadFile = File(...),
@@ -108,14 +117,14 @@ async def upload_nft_image(
 @router.post(
     "/nft/upload-mint-nft",
     name="nft:upload-mint-nft",
-    # response_model=Any,
-    # responses={
-    #     201: {
-    #         "model": Any,
-    #         "description": "A response object that contains info about"
-    #         " a wallet.",
-    #     },
-    # },
+    response_model=auth_schemas.ResponseSchema,
+    responses={
+        200: {
+            "model": auth_schemas.ResponseSchema,
+            "description": "A response object that indicates an nft"
+            " has been minted successfully!",
+        },
+    },
 )
 async def upload_nft_image_and_mint_nft(
     nft_info: nfts_schemas.NFTBase64ObjectSchema,
@@ -144,14 +153,14 @@ async def upload_nft_image_and_mint_nft(
 @router.get(
     "/nft/get-wallet-nfts",
     name="nft:get-wallet-nfts",
-    # response_model=Any,
-    # responses={
-    #     201: {
-    #         "model": Any,
-    #         "description": "A response object that contains info about"
-    #         " a wallet.",
-    #     },
-    # },
+    response_model=nfts_schemas.ResponseSchema,
+    responses={
+        200: {
+            "model": Any,
+            "description": "A response object that contains info about"
+            " a given wallet nfts.",
+        },
+    },
 )
 async def fetch_all_nfts(
     current_wallet: Any = Depends(jwt.get_current_active_wallet),
@@ -166,14 +175,14 @@ async def fetch_all_nfts(
 @router.get(
     "/nft/get-all",
     name="nft:get-wallets-nfts",
-    # response_model=Any,
-    # responses={
-    #     201: {
-    #         "model": Any,
-    #         "description": "A response object that contains info about"
-    #         " a wallet.",
-    #     },
-    # },
+    response_model=nfts_schemas.ResponseSchema,
+    responses={
+        200: {
+            "model": nfts_schemas.ResponseSchema,
+            "description": "A response object that contains info about"
+            " a all nfts available on the marketplace.",
+        },
+    },
 )
 async def fetch_all_wallets_nfts(
     session: AIOSession = Depends(dependencies.get_db_transactional_session),
