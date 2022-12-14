@@ -192,7 +192,7 @@ For development purposes, you can use openapi to interact with the endpoints. To
 
 As you can notice, the default openapi authorization form has been customized to authenticate wallets using only an access token.
 
-- Now you can interact with any endpoints that require authorization.
+- Now you can interact with any endpoint that require authentication.
 
 ![wallet info](./static/wallet-info.png)
 
