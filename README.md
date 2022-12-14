@@ -8,8 +8,9 @@
 [![Static typing: mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 ![Codeql](https://github.com/github/docs/actions/workflows/codeql.yml/badge.svg)
-
 </div>
+
+![architecture](./static/architecture.png)
 
 A Fully Async-based backend for [Moerphous](https://github.com/moerphous/moerphous).
 
@@ -192,7 +193,7 @@ For development purposes, you can use openapi to interact with the endpoints. To
 
 As you can notice, the default openapi authorization form has been customized to authenticate wallets using only an access token.
 
-- Now you can interact with any endpoints that require authorization.
+- Now you can interact with any endpoint that require authentication.
 
 ![wallet info](./static/wallet-info.png)
 
