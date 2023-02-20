@@ -25,7 +25,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.9.10"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
-fastapi = {extras = ["uvicorn"], version = "^0.87.0"}
+fastapi = {extras = ["uvicorn"], version = "^0.92.0"}
 pyjwt = "^2.6.0"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
 pydantic = {extras = ["email"], version = "^1.10.2"}
