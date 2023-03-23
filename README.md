@@ -345,6 +345,11 @@ heroku open --app=<your app name>
 
 You can refer to [heroku dev center](https://devcenter.heroku.com/articles/local-development-with-docker-compose) for more info. Happy Herokuing!
 
+### Render
+
+<a href="https://render.com/deploy?repo=https://github.com/moerphous/moerphous-server/tree/main">
+  <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render">
+</a>
 
 ## Core Dependencies
 
