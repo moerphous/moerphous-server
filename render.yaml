@@ -1,0 +1,30 @@
+services:
+  - type: web
+    name: moerphous-server
+    env: python
+    buildCommand: "python -m pip install -r requirements.txt"
+    startCommand: "uvicorn main:app --host 0.0.0.0 --port 10000"
+    repo: https://github.com/moerphous/moerphous-server.git
+    region: oregon
+    plan: free
+    branch: main
+    numInstances: 1
+    envVars:
+      - key: MONGODB_USERNAME
+        sync: false
+      - key: MONGODB_PASSWORD
+        sync: false
+      - key: MONGODB_HOST
+        sync: false
+      - key: MONGODB_DATABASE
+        value: xrpl
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: info
+      - key: CORS_ORIGINS
+        sync: false
+      - key: PINATA_API_KEY
+        sync: false
+      - key: PINATA_API_SECRET
+        sync: false
